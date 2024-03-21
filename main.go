@@ -1,9 +1,8 @@
 package main
 
 import (
-	"time"
-
 	"github.com/rivo/tview"
+	"time"
 )
 
 func main() {
@@ -14,8 +13,7 @@ func main() {
 	initializeBoard(board)
 	app := tview.NewApplication()
 	textView := tview.NewTextView().
-		SetSize(50, 50).
-        SetTextAlign(tview.AlignCenter)
+		SetSize(50, 50)
 
 	ticker := time.NewTicker(100 * time.Millisecond)
 	defer ticker.Stop()
@@ -25,9 +23,9 @@ func main() {
 			select {
 			case <-ticker.C:
 				updateBoard(board)
-                app.QueueUpdateDraw(func() {
-                    textView.SetText(boardAsString(board))
-                })
+				app.QueueUpdateDraw(func() {
+					textView.SetText(boardAsString(board))
+				})
 			}
 		}
 	}()
@@ -48,9 +46,9 @@ func initializeBoard(board [][]string) {
 	board[3][1] = "X"
 	board[3][2] = "X"
 	board[3][3] = "X"
-    board[4][2] = "X"
-    board[4][3] = "X"
-    board[5][2] = "X"
+	board[4][2] = "X"
+	board[4][3] = "X"
+	board[5][2] = "X"
 }
 
 func getNeighbors(board [][]string, x int, y int) int {
