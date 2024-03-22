@@ -1,15 +1,25 @@
 package board
 
-func New(row int, col int) [][]string {
+// Creates a new board with the given number of rows and columns
+// Use this if you want to manage the initial state of the board yourself
+func NewBlank(row int, col int) [][]string {
 	board := make([][]string, row)
 	for i := range board {
 		board[i] = make([]string, col)
 	}
-	initialize(board)
 	return board
 }
 
-func initialize(board [][]string) {
+// Creates a new board with the given number of rows and columns and initializes
+// it with the default starting state
+// Use this if you just want to go without thinking about initializing a board
+func NewDefault(row int, col int) [][]string {
+	board := NewBlank(row, col)
+	defaultInitialize(board)
+	return board
+}
+
+func defaultInitialize(board [][]string) {
 	for i := range board {
 		for j := range board[i] {
 			board[i][j] = " "
@@ -47,7 +57,6 @@ func getNeighbors(board [][]string, x int, y int) int {
 // Any live cell with two or three live neighbors lives on to the next generation.
 // Any live cell with more than three live neighbors dies, as if by overpopulation.
 // Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-
 func Update(board [][]string) {
 	for i := range board {
 		for j := range board[i] {

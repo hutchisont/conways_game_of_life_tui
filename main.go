@@ -25,7 +25,7 @@ func main() {
 		return
 	}
 
-	gameBoard := board.New(rows, cols)
+	gameBoard := board.NewDefault(rows, cols)
 	app := tview.NewApplication()
 	textView := tview.NewTextView().
 		SetSize(rows, cols)
