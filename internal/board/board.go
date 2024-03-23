@@ -94,20 +94,25 @@ func getNeighbors(board [][]string, r int, c int) int {
 // Any live cell with more than three live neighbors dies, as if by overpopulation.
 // Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
 func Update(board [][]string) {
+	newBoard := NewBlank(len(board), len(board[0]))
 	for i := range board {
 		for j := range board[i] {
 			neighbors := getNeighbors(board, i, j)
 			switch {
 			case neighbors < 2:
-				board[i][j] = " "
+				newBoard[i][j] = " "
 			case neighbors == 2:
-				continue
+				newBoard[i][j] = board[i][j]
 			case neighbors < 4:
-				board[i][j] = "X"
+				newBoard[i][j] = "X"
 			default:
-				board[i][j] = " "
+				newBoard[i][j] = " "
 			}
 		}
+	}
+
+	for i := range board {
+		copy(board[i], newBoard[i])
 	}
 }
 
