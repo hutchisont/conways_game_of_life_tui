@@ -71,17 +71,17 @@ func defaultInitialize(board [][]string) {
 	board[5][2] = "X"
 }
 
-func getNeighbors(board [][]string, x int, y int) int {
+func getNeighbors(board [][]string, r int, c int) int {
 	var neighbors int
 	for i := -1; i < 2; i++ {
 		for j := -1; j < 2; j++ {
 			if i == 0 && j == 0 {
 				continue
 			}
-			if x+i < 0 || x+i >= len(board) || y+j < 0 || y+j >= len(board[0]) {
+			if r+i < 0 || r+i >= len(board) || c+j < 0 || c+j >= len(board[0]) {
 				continue
 			}
-			if board[x+i][y+j] == "X" {
+			if board[r+i][c+j] == "X" {
 				neighbors++
 			}
 		}
