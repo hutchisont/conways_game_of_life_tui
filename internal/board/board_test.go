@@ -59,48 +59,146 @@ func TestNewDefault(t *testing.T) {
 	}
 
 	if !boardsEqual(board, expected) {
-		t.Errorf("Expected %v, got %v", expected, board)
+		t.Errorf("Expected:\n%s got:\n%s",
+			strings.ReplaceAll(AsString(expected), " ", "*"),
+			strings.ReplaceAll(AsString(board), " ", "*"))
 	}
 }
 
-func TestUpdate(t *testing.T) {
-	board := NewDefault(10, 10)
-	Update(board)
+
+func TestThreeRowInit(t *testing.T) {
+	board := NewBlank(10, 10)
+	board[5][5] = "X"
+	board[5][6] = "X"
+	board[5][7] = "X"
 
 	expected := [][]string{
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", " ", " ", "X", " ", " ", " ", " ", " ", " "},
-		{" ", "X", " ", "X", "X", " ", " ", " ", " ", " "},
-		{" ", "X", " ", "X", "X", " ", " ", " ", " ", " "},
-		{" ", " ", "X", "X", "X", " ", " ", " ", " ", " "},
-		{" ", " ", " ", "X", "X", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", "X", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", "X", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", "X", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-	}
-
-	if !boardsEqual(board, expected) {
-		t.Errorf("Expected: %v got: %v", AsString(expected), AsString(board))
 	}
 
 	Update(board)
 
+	if !boardsEqual(board, expected) {
+		t.Errorf("Expected:\n%s got:\n%s",
+			strings.ReplaceAll(AsString(expected), " ", "*"),
+			strings.ReplaceAll(AsString(board), " ", "*"))
+	}
+
 	expected = [][]string{
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", " ", "X", "X", "X", " ", " ", " ", " ", " "},
-		{" ", "X", " ", " ", " ", " ", " ", " ", " ", " "},
-		{" ", "X", " ", " ", "X", " ", " ", " ", " ", " "},
-		{" ", " ", "X", " ", "X", "X", " ", " ", " ", " "},
-		{" ", " ", " ", "X", "X", "X", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", "X", "X", "X", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+	}
+
+	Update(board)
+
+	if !boardsEqual(board, expected) {
+		t.Errorf("Expected:\n%s got:\n%s",
+			strings.ReplaceAll(AsString(expected), " ", "*"),
+			strings.ReplaceAll(AsString(board), " ", "*"))
+	}
+}
+
+func TestRPentominoInit(t *testing.T) {
+	board := NewRPentomino(10, 10)
+
+	// **********
+	// **********
+	// **********
+	// ***XXX****
+	// ***X******
+	// ***XX*****
+	// **********
+	// **********
+	// **********
+	// **********
+
+	expected := [][]string{
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
+		{" ", " ", " ", " ", "X", "X", "X", " ", " ", " "},
+		{" ", " ", " ", " ", "X", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", "X", "X", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
 		{" ", " ", " ", " ", " ", " ", " ", " ", " ", " "},
 	}
 
+	Update(board)
+
 	if !boardsEqual(board, expected) {
-		t.Errorf("Expected: %v got: %v", AsString(expected), AsString(board))
+		t.Errorf("Expected:\n%s got:\n%s",
+			strings.ReplaceAll(AsString(expected), " ", "*"),
+			strings.ReplaceAll(AsString(board), " ", "*"))
+	}
+}
+
+func TestGetNeighbors(t *testing.T) {
+	board := NewBlank(10, 10)
+	board[3][1] = "X"
+	board[3][2] = "X"
+	board[3][3] = "X"
+	board[4][2] = "X"
+	board[4][3] = "X"
+	board[5][2] = "X"
+	
+	// **********
+	// **********
+	// **********
+	// *XXX******
+	// **XX******
+	// **X*******
+	// **********
+	// **********
+	// **********
+	// **********
+
+	neighbors := getNeighbors(board, 3, 1)
+	if neighbors != 2 {
+		t.Errorf("Expected 2, got %d", neighbors)
+	}
+
+	neighbors = getNeighbors(board, 3, 2)
+	if neighbors != 4 {
+		t.Errorf("Expected 4, got %d", neighbors)
+	}
+
+	neighbors = getNeighbors(board, 3, 3)
+	if neighbors != 3 {
+		t.Errorf("Expected 3, got %d", neighbors)
+	}
+
+	neighbors = getNeighbors(board, 4, 2)
+	if neighbors != 5 {
+		t.Errorf("Expected 5, got %d", neighbors)
+	}
+
+	neighbors = getNeighbors(board, 4, 3)
+	if neighbors != 4 {
+		t.Errorf("Expected 4, got %d", neighbors)
+	}
+
+	neighbors = getNeighbors(board, 5, 2)
+	if neighbors != 2 {
+		t.Errorf("Expected 2, got %d", neighbors)
 	}
 }
 
