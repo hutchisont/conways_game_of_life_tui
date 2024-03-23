@@ -60,7 +60,6 @@ func defaultInitialize(board [][]string) {
 	// **********
 	// **********
 
-
 	board[1][2] = "X"
 	board[2][3] = "X"
 	board[3][1] = "X"

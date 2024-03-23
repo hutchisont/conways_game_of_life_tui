@@ -65,7 +65,6 @@ func TestNewDefault(t *testing.T) {
 	}
 }
 
-
 func TestThreeRowInit(t *testing.T) {
 	board := NewBlank(10, 10)
 	board[5][5] = "X"
@@ -159,7 +158,7 @@ func TestGetNeighbors(t *testing.T) {
 	board[4][2] = "X"
 	board[4][3] = "X"
 	board[5][2] = "X"
-	
+
 	// **********
 	// **********
 	// **********
