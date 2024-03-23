@@ -7,6 +7,13 @@ func NewBlank(row int, col int) [][]string {
 	for i := range board {
 		board[i] = make([]string, col)
 	}
+
+	for i := range board {
+		for j := range board[i] {
+			board[i][j] = " "
+		}
+	}
+
 	return board
 }
 
@@ -19,12 +26,41 @@ func NewDefault(row int, col int) [][]string {
 	return board
 }
 
+func NewRPentomino(row int, col int) [][]string {
+	board := NewBlank(row, col)
+
+	// will be the below pattern in the center of the board
+	// **********
+	// ****XX****
+	// ***XX*****
+	// ****X*****
+	// **********
+
+	baseRow := row / 2
+	baseCol := col / 2
+
+	board[baseRow][baseCol] = "X"
+	board[baseRow][baseCol+1] = "X"
+	board[baseRow+1][baseCol-1] = "X"
+	board[baseRow+1][baseCol] = "X"
+	board[baseRow+2][baseCol] = "X"
+
+	return board
+}
+
 func defaultInitialize(board [][]string) {
-	for i := range board {
-		for j := range board[i] {
-			board[i][j] = " "
-		}
-	}
+	// **********
+	// **X*******
+	// ***X******
+	// *XXX******
+	// **XX******
+	// **X*******
+	// **********
+	// **********
+	// **********
+	// **********
+
+
 	board[1][2] = "X"
 	board[2][3] = "X"
 	board[3][1] = "X"

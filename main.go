@@ -25,7 +25,7 @@ func main() {
 		return
 	}
 
-	gameBoard := board.NewDefault(rows, cols)
+	gameBoard := board.NewRPentomino(rows, cols)
 	app := tview.NewApplication()
 	textView := tview.NewTextView().
 		SetSize(rows, cols)
