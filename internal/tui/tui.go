@@ -34,7 +34,7 @@ func New(rows, cols int, tickTime time.Duration) *TUI {
 	t.initMenu()
 	t.initConfig()
 
-	t.gameBoard = board.NewBlank(t.rows, t.cols)
+	t.gameBoard = board.NewRPentomino(t.rows, t.cols)
 
 	t.boardView = tview.NewTextView().
 		SetSize(t.rows, t.cols).
