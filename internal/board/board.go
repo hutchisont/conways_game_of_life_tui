@@ -31,43 +31,43 @@ func NewRPentomino(row int, col int) [][]string {
 
 	// will be the below pattern in the center of the board
 	// **********
-	// ****XX****
-	// ***XX*****
-	// ****X*****
+	// ****OO****
+	// ***OO*****
+	// ****O*****
 	// **********
 
 	baseRow := row / 2
 	baseCol := col / 2
 
-	board[baseRow][baseCol] = "X"
-	board[baseRow][baseCol+1] = "X"
-	board[baseRow+1][baseCol-1] = "X"
-	board[baseRow+1][baseCol] = "X"
-	board[baseRow+2][baseCol] = "X"
+	board[baseRow][baseCol] = "O"
+	board[baseRow][baseCol+1] = "O"
+	board[baseRow+1][baseCol-1] = "O"
+	board[baseRow+1][baseCol] = "O"
+	board[baseRow+2][baseCol] = "O"
 
 	return board
 }
 
 func defaultInitialize(board [][]string) {
 	// **********
-	// **X*******
-	// ***X******
-	// *XXX******
-	// **XX******
-	// **X*******
+	// **O*******
+	// ***O******
+	// *OOO******
+	// **OO******
+	// **O*******
 	// **********
 	// **********
 	// **********
 	// **********
 
-	board[1][2] = "X"
-	board[2][3] = "X"
-	board[3][1] = "X"
-	board[3][2] = "X"
-	board[3][3] = "X"
-	board[4][2] = "X"
-	board[4][3] = "X"
-	board[5][2] = "X"
+	board[1][2] = "O"
+	board[2][3] = "O"
+	board[3][1] = "O"
+	board[3][2] = "O"
+	board[3][3] = "O"
+	board[4][2] = "O"
+	board[4][3] = "O"
+	board[5][2] = "O"
 }
 
 func getNeighbors(board [][]string, r int, c int) int {
@@ -80,7 +80,7 @@ func getNeighbors(board [][]string, r int, c int) int {
 			if r+i < 0 || r+i >= len(board) || c+j < 0 || c+j >= len(board[0]) {
 				continue
 			}
-			if board[r+i][c+j] == "X" {
+			if board[r+i][c+j] == "O" {
 				neighbors++
 			}
 		}
@@ -103,7 +103,7 @@ func Update(board [][]string) {
 			case neighbors == 2:
 				newBoard[i][j] = board[i][j]
 			case neighbors < 4:
-				newBoard[i][j] = "X"
+				newBoard[i][j] = "O"
 			default:
 				newBoard[i][j] = " "
 			}
