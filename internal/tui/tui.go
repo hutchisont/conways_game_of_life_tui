@@ -102,7 +102,7 @@ func (t *TUI) initMenu() {
 
 func (t *TUI) initConfig() {
 	t.config = tview.NewForm()
-	t.config.AddInputField("Rows", "50", 10,
+	t.config.AddInputField("Rows", strconv.Itoa(t.rows), 10,
 		func(textToCheck string, lastChar rune) bool {
 			_, err := strconv.Atoi(textToCheck)
 			return err == nil
@@ -113,7 +113,7 @@ func (t *TUI) initConfig() {
 				t.rows = r
 			}
 		})
-	t.config.AddInputField("Columns", "50", 10,
+	t.config.AddInputField("Columns", strconv.Itoa(t.cols), 10,
 		func(textToCheck string, lastChar rune) bool {
 			_, err := strconv.Atoi(textToCheck)
 			return err == nil
@@ -124,7 +124,8 @@ func (t *TUI) initConfig() {
 				t.cols = c
 			}
 		})
-	t.config.AddInputField("Tick Time (ms)", "16", 10,
+	t.config.AddInputField("Tick Time (ms)",
+		strconv.FormatInt(t.tickTime.Milliseconds(), 10), 10,
 		func(textToCheck string, lastChar rune) bool {
 			_, err := strconv.Atoi(textToCheck)
 			return err == nil
