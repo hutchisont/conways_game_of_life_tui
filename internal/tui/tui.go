@@ -141,6 +141,9 @@ func (t *TUI) initConfig() {
 		if t.boardView != nil {
 			t.boardView.SetSize(t.rows, t.cols).SetText(board.AsString(t.gameBoard))
 		}
+		t.pages.SwitchToPage("board")
+	})
+	t.config.AddButton("Back", func() {
 		t.pages.SwitchToPage("menu")
 	})
 }
