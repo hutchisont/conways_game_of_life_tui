@@ -11,38 +11,47 @@ import (
 )
 
 type TUI struct {
-	app       *tview.Application
-	pages     *tview.Pages
-	menu      *tview.Modal
-	config    *tview.Form
-	boardView *tview.TextView
-	rows      int
-	cols      int
-	gameBoard [][]string
-	tickTime  time.Duration
+	app             *tview.Application
+	pages           *tview.Pages
+	menu            *tview.Modal
+	config          *tview.Form
+	boardConfig     *tview.Table
+	boardView       *tview.TextView
+	newRows         int
+	newCols         int
+	curRows         int
+	curCols         int
+	activeGameBoard [][]string
+	customGameBoard [][]string
+	tickTime        time.Duration
+	useCustomBoard  bool
 }
 
 func New(rows, cols int, tickTime time.Duration) *TUI {
 	t := TUI{
-		rows:     rows,
-		cols:     cols,
-		tickTime: tickTime,
+		app:             tview.NewApplication(),
+		pages:           tview.NewPages(),
+		curRows:         rows,
+		curCols:         cols,
+		newRows:         rows,
+		newCols:         cols,
+		tickTime:        tickTime,
+		useCustomBoard:  false,
+		activeGameBoard: board.NewRPentomino(rows, cols),
 	}
 
-	t.app = tview.NewApplication()
-	t.pages = tview.NewPages()
 	t.initMenu()
 	t.initConfig()
-
-	t.gameBoard = board.NewRPentomino(t.rows, t.cols)
+	t.initBoardConfig()
 
 	t.boardView = tview.NewTextView().
-		SetSize(t.rows, t.cols).
-		SetText(board.AsString(t.gameBoard))
+		SetSize(t.curRows, t.curCols).
+		SetText(board.AsString(t.activeGameBoard))
 
 	t.pages.AddPage("menu", t.menu, true, true)
 	t.pages.AddPage("config", t.config, true, false)
 	t.pages.AddPage("board", t.boardView, true, false)
+	t.pages.AddPage("boardConfig", t.boardConfig, true, false)
 
 	t.app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyESC {
@@ -64,9 +73,9 @@ func (t *TUI) Run() error {
 			select {
 			case <-ticker.C:
 				if name, item := t.pages.GetFrontPage(); item != nil && name == "board" {
-					board.Update(t.gameBoard)
+					board.Update(t.activeGameBoard)
 					t.app.QueueUpdateDraw(func() {
-						t.boardView.SetText(board.AsString(t.gameBoard))
+						t.boardView.SetText(board.AsString(t.activeGameBoard))
 					})
 				}
 				if t.tickTime > 0 && t.tickTime != oldTick {
@@ -82,6 +91,50 @@ func (t *TUI) Run() error {
 	}
 
 	return nil
+}
+
+func (t *TUI) initBoardConfig() {
+	// TODO: probably more correct/efficient to SetContent for the table to
+	// a custom implementation rather than using the default like this.
+	// It could then be a direct display of a gameBoard I think.
+	t.boardConfig = tview.NewTable().
+		SetBorders(true)
+
+	for r := 0; r < t.curRows; r++ {
+		for c := 0; c < t.curCols; c++ {
+			color := tcell.ColorWhite
+			t.boardConfig.SetCell(r, c, tview.NewTableCell(" ").SetTextColor(color))
+		}
+	}
+
+	t.boardConfig.Select(0, 0).
+		SetSelectable(true, true).
+		SetDoneFunc(func(key tcell.Key) {
+			if key == tcell.KeyTab {
+				newBoard := board.NewBlank(t.curRows, t.curCols)
+				for r := 0; r < t.curRows; r++ {
+					for c := 0; c < t.curCols; c++ {
+						if t.boardConfig.GetCell(r, c).Text == "O" {
+							newBoard[r][c] = "O"
+						}
+					}
+				}
+				t.customGameBoard = newBoard
+				t.pages.SwitchToPage("config")
+			}
+		}).
+		SetSelectedFunc(func(row, column int) {
+			toggleCellText(t.boardConfig.GetCell(row, column))
+		})
+
+}
+
+func toggleCellText(cell *tview.TableCell) {
+	if cell.Text == " " {
+		cell.SetText("O")
+	} else {
+		cell.SetText(" ")
+	}
 }
 
 func (t *TUI) initMenu() {
@@ -102,7 +155,7 @@ func (t *TUI) initMenu() {
 
 func (t *TUI) initConfig() {
 	t.config = tview.NewForm()
-	t.config.AddInputField("Rows", strconv.Itoa(t.rows), 10,
+	t.config.AddInputField("Rows", strconv.Itoa(t.curRows), 10,
 		func(textToCheck string, lastChar rune) bool {
 			_, err := strconv.Atoi(textToCheck)
 			return err == nil
@@ -110,10 +163,10 @@ func (t *TUI) initConfig() {
 		func(newRows string) {
 			r, err := strconv.Atoi(newRows)
 			if err == nil {
-				t.rows = r
+				t.newRows = r
 			}
 		})
-	t.config.AddInputField("Columns", strconv.Itoa(t.cols), 10,
+	t.config.AddInputField("Columns", strconv.Itoa(t.curCols), 10,
 		func(textToCheck string, lastChar rune) bool {
 			_, err := strconv.Atoi(textToCheck)
 			return err == nil
@@ -121,7 +174,7 @@ func (t *TUI) initConfig() {
 		func(newCols string) {
 			c, err := strconv.Atoi(newCols)
 			if err == nil {
-				t.cols = c
+				t.newCols = c
 			}
 		})
 	t.config.AddInputField("Tick Time (ms)",
@@ -136,14 +189,46 @@ func (t *TUI) initConfig() {
 				t.tickTime = time.Duration(tick) * time.Millisecond
 			}
 		})
+	t.config.AddCheckbox("Use Custom Board", false, func(checked bool) {
+		t.useCustomBoard = checked
+	})
+	t.config.AddButton("Custom Board", func() {
+		t.pages.SwitchToPage("boardConfig")
+	})
 	t.config.AddButton("Done", func() {
-		t.gameBoard = board.NewRPentomino(t.rows, t.cols)
-		if t.boardView != nil {
-			t.boardView.SetSize(t.rows, t.cols).SetText(board.AsString(t.gameBoard))
+		changedRowCol := t.updateActiveRowsCols()
+
+		if changedRowCol {
+			// have to redo initBoardConfig to account for new rows/cols values
+			t.initBoardConfig()
+			t.pages.RemovePage("boardConfig")
+			t.pages.AddPage("boardConfig", t.boardConfig, true, false)
 		}
+
+		if t.useCustomBoard {
+			t.activeGameBoard = t.customGameBoard
+		} else {
+			t.activeGameBoard = board.NewRPentomino(t.curRows, t.curCols)
+		}
+
+		t.boardView.SetSize(t.curRows, t.curCols).SetText(board.AsString(t.activeGameBoard))
 		t.pages.SwitchToPage("board")
 	})
 	t.config.AddButton("Back", func() {
 		t.pages.SwitchToPage("menu")
 	})
+}
+
+func (t *TUI) updateActiveRowsCols() bool {
+	changed := false
+	if t.newRows != t.curRows {
+		changed = true
+		t.curRows = t.newRows
+	}
+	if t.newCols != t.curCols {
+		changed = true
+		t.curCols = t.newCols
+	}
+
+	return changed
 }
